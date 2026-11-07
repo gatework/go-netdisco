@@ -1,0 +1,15 @@
+[
+  {
+    "channel": 36,
+    "descr": null,
+    "device_name": "switch-a",
+    "dns": "switch-a.invalid",
+    "ip": "192.0.2.10",
+    "location": "integration-lab",
+    "model": "fixture-switch",
+    "port": "Radio0",
+    "port_name": "fixture-port",
+    "power": 12,
+    "power2": "10.8"
+  }
+]

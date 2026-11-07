@@ -1,282 +1,368 @@
 package netdisco
 
-import (
-	"encoding/json"
-	"github.com/cespare/xxhash/v2"
-	"net/url"
-	"strconv"
-)
+import "encoding/json"
 
-const SeparatorByte byte = 255
-
-var separatorByteSlice = []byte{SeparatorByte}
-
-type Float64String float64
-
-func (f *Float64String) UnmarshalJSON(b []byte) error {
-	var result float64
-	if err := json.Unmarshal(b, &result); err == nil {
-		*f = Float64String(result)
-		return nil
-	}
-	var resultString string
-	if err := json.Unmarshal(b, &resultString); err != nil {
-		return err
-	}
-	fVal, err := strconv.ParseFloat(resultString, 64)
-	if err != nil {
-		*f = Float64String(0)
-		return nil
-	}
-	*f = Float64String(fVal)
-	return nil
+// DeviceName is the device identity joined into port and node search rows.
+type DeviceName struct {
+	DNS  *string `json:"dns"`
+	Name *string `json:"name"`
 }
 
-func (f Float64String) MarshalJSON() ([]byte, error) {
-	return json.Marshal(float64(f))
-}
-
+// Device is an inventory row. Timestamps retain the server's original text,
+// because Netdisco's SQL timestamps do not include a timezone contract.
+// SNMP credentials are deliberately absent from this model.
 type Device struct {
-	Log               string        `json:"log"`
-	Location          string        `json:"location"`
-	LastMacsuckStamp  string        `json:"last_macsuck_stamp"`
-	Ps2Type           string        `json:"ps2_type"`
-	SnmpVer           int           `json:"snmp_ver"`
-	LastArpnip        string        `json:"last_arpnip"`
-	Creation          string        `json:"creation"`
-	SnmpClass         string        `json:"snmp_class"`
-	Ps1Type           string        `json:"ps1_type"`
-	Contact           string        `json:"contact"`
-	SnmpEngineid      string        `json:"snmp_engineid"`
-	Model             string        `json:"model"`
-	SinceFirstSeen    Float64String `json:"since_first_seen"`
-	SnmpComm          string        `json:"snmp_comm"`
-	Name              string        `json:"name"`
-	Slots             int           `json:"slots"`
-	IP                string        `json:"ip"`
-	SinceLastMacsuck  Float64String `json:"since_last_macsuck"`
-	Os                string        `json:"os"`
-	LastDiscover      string        `json:"last_discover"`
-	Layers            string        `json:"layers"`
-	DNS               string        `json:"dns"`
-	VtpDomain         string        `json:"vtp_domain"`
-	UptimeAge         string        `json:"uptime_age"`
-	Mac               string        `json:"mac"`
-	LastDiscoverStamp string        `json:"last_discover_stamp"`
-	Uptime            int64         `json:"uptime"`
-	Description       string        `json:"description"`
-	ChassisID         string        `json:"chassis_id"`
-	FirstSeenStamp    string        `json:"first_seen_stamp"`
-	Fan               string        `json:"fan"`
-	Ps1Status         string        `json:"ps1_status"`
-	LastArpnipStamp   string        `json:"last_arpnip_stamp"`
-	Vendor            string        `json:"vendor"`
-	LastMacsuck       string        `json:"last_macsuck"`
-	Ps2Status         string        `json:"ps2_status"`
-	SinceLastArpnip   Float64String `json:"since_last_arpnip"`
-	SinceLastDiscover Float64String `json:"since_last_discover"`
-	OsVer             string        `json:"os_ver"`
-	NumPorts          int           `json:"num_ports"`
-	Serial            string        `json:"serial"`
-	IsPseudo          int           `json:"is_pseudo"`
-
-	Alias string `json:"alias"`
+	IP           string     `json:"ip"`
+	Creation     *string    `json:"creation"`
+	DNS          *string    `json:"dns"`
+	Description  *string    `json:"description"`
+	Uptime       *int64     `json:"uptime"`
+	Contact      *string    `json:"contact"`
+	Name         *string    `json:"name"`
+	Location     *string    `json:"location"`
+	Layers       *string    `json:"layers"`
+	MAC          *string    `json:"mac"`
+	Serial       *string    `json:"serial"`
+	ChassisID    *string    `json:"chassis_id"`
+	Model        *string    `json:"model"`
+	PS1Type      *string    `json:"ps1_type"`
+	PS2Type      *string    `json:"ps2_type"`
+	PS1Status    *string    `json:"ps1_status"`
+	PS2Status    *string    `json:"ps2_status"`
+	Fan          *string    `json:"fan"`
+	Slots        *int64     `json:"slots"`
+	Vendor       *string    `json:"vendor"`
+	OS           *string    `json:"os"`
+	OSVersion    *string    `json:"os_ver"`
+	Log          *string    `json:"log"`
+	SNMPVersion  *int64     `json:"snmp_ver"`
+	SNMPClass    *string    `json:"snmp_class"`
+	SNMPEngineID *string    `json:"snmp_engineid"`
+	VTPDomain    *string    `json:"vtp_domain"`
+	VTPMode      *string    `json:"vtp_mode"`
+	LastDiscover *string    `json:"last_discover"`
+	LastMACSuck  *string    `json:"last_macsuck"`
+	LastARPNip   *string    `json:"last_arpnip"`
+	IsPseudo     *bool      `json:"is_pseudo"`
+	PAEIsEnabled *bool      `json:"pae_is_enabled"`
+	CustomFields JSONFields `json:"custom_fields"`
+	Tags         []string   `json:"tags"`
+	PoE          *DevicePoE `json:"poe,omitempty"`
 }
 
-type SearchDeviceQuery struct {
-	Q             string `json:"q" yaml:"q"`
-	Name          string `json:"name" yaml:"name"`
-	Location      string `json:"location" yaml:"location"`
-	DNS           string `json:"dns" yaml:"dns"`
-	Ip            string `json:"ip" yaml:"ip"`
-	Description   string `json:"description" yaml:"description"`
-	Mac           string `json:"mac" yaml:"mac"`
-	Model         string `json:"model" yaml:"model"`
-	OS            string `json:"os" yaml:"os"`
-	OSVer         string `json:"os_ver" yaml:"os_ver"`
-	Vendor        string `json:"vendor" yaml:"vendor"`
-	Layers        string `json:"layers" yaml:"layers"`
-	Matchall      bool   `json:"matchall" yaml:"matchall"`
-	SeeAllColumns bool   `json:"seeallcolumns" yaml:"seeallcolumns"`
-
-	queryId uint64 `json:"-" yaml:"-"`
+// PoEStats contains counts and power totals calculated by the server.
+type PoEStats struct {
+	CapablePorts    *int64   `json:"poe_capable_ports"`
+	PoweredPorts    *int64   `json:"poe_powered_ports"`
+	DisabledPorts   *int64   `json:"poe_disabled_ports"`
+	ErroredPorts    *int64   `json:"poe_errored_ports"`
+	PowerCommitted  *float64 `json:"poe_power_committed"`
+	PowerDelivering *float64 `json:"poe_power_delivering"`
 }
 
-func (q *SearchDeviceQuery) Serialize() url.Values {
-	values := make(url.Values)
-
-	if q.Q != "" {
-		values["q"] = []string{q.Q}
-	}
-	if q.Name != "" {
-		values["name"] = []string{q.Name}
-	}
-	if q.Location != "" {
-		values["location"] = []string{q.Location}
-	}
-	if q.DNS != "" {
-		values["dns"] = []string{q.DNS}
-	}
-	if q.Ip != "" {
-		values["ip"] = []string{q.Ip}
-	}
-	if q.Description != "" {
-		values["description"] = []string{q.Description}
-	}
-	if q.Mac != "" {
-		values["mac"] = []string{q.Mac}
-	}
-	if q.Model != "" {
-		values["model"] = []string{q.Model}
-	}
-	if q.OS != "" {
-		values["os"] = []string{q.OS}
-	}
-	if q.OSVer != "" {
-		values["os_ver"] = []string{q.OSVer}
-	}
-	if q.Vendor != "" {
-		values["vendor"] = []string{q.Vendor}
-	}
-	if q.Layers != "" {
-		values["layers"] = []string{q.Layers}
-	}
-	if q.Matchall {
-		values["matchall"] = []string{"true"}
-	} else {
-		values["matchall"] = []string{"false"}
-	}
-	if q.SeeAllColumns {
-		values["seeallcolumns"] = []string{"true"}
-	} else {
-		values["seeallcolumns"] = []string{"false"}
-	}
-	return values
+// DevicePoE is present on Devices.Get when the server finds power modules.
+type DevicePoE struct {
+	PoEStats
+	Modules    int64 `json:"modules"`
+	PowerTotal int64 `json:"power_total"`
 }
 
-func (q *SearchDeviceQuery) Id() uint64 {
-	if q.queryId != 0 {
-		return q.queryId
-	}
-	xxh := xxhash.New()
-	for key, val := range q.Serialize() {
-		xxh.WriteString("$" + key + "$" + val[0])
-		xxh.Write(separatorByteSlice)
-	}
-	q.queryId = xxh.Sum64()
-	return q.queryId
+// DeviceIP is an interface address belonging to a device's canonical IP.
+type DeviceIP struct {
+	IP        string  `json:"ip"`
+	Alias     string  `json:"alias"`
+	Subnet    *string `json:"subnet"`
+	Port      *string `json:"port"`
+	DNS       *string `json:"dns"`
+	Creation  *string `json:"creation"`
+	FirstSeen *string `json:"first_seen"`
 }
 
-type DeviceDetails struct {
-	Model        string `json:"model"`
-	Fan          string `json:"fan"`
-	Vendor       string `json:"vendor"`
-	Layers       string `json:"layers"`
-	Uptime       int64  `json:"uptime"`
-	LastDiscover string `json:"last_discover"`
-	Creation     string `json:"creation"`
-	OsVer        string `json:"os_ver"`
-	Log          string `json:"log"`
-	Slots        int    `json:"slots"`
-	Description  string `json:"description"`
-	IP           string `json:"ip"`
-	VtpDomain    string `json:"vtp_domain"`
-	ChassisID    string `json:"chassis_id"`
-	Ps2Type      string `json:"ps2_type"`
-	LastMacsuck  string `json:"last_macsuck"`
-	SnmpComm     string `json:"snmp_comm"`
-	Ps1Status    string `json:"ps1_status"`
-	SnmpEngineid string `json:"snmp_engineid"`
-	IsPseudo     int    `json:"is_pseudo"`
-	Os           string `json:"os"`
-	SnmpVer      int    `json:"snmp_ver"`
-	Name         string `json:"name"`
-	Ps2Status    string `json:"ps2_status"`
-	DNS          string `json:"dns"`
-	Location     string `json:"location"`
-	Serial       string `json:"serial"`
-	Ps1Type      string `json:"ps1_type"`
-	SnmpClass    string `json:"snmp_class"`
-	Contact      string `json:"contact"`
-	LastArpnip   string `json:"last_arpnip"`
-	Mac          string `json:"mac"`
+// DeviceVLAN is a VLAN known by a device.
+type DeviceVLAN struct {
+	IP           string  `json:"ip"`
+	VLAN         int64   `json:"vlan"`
+	Description  *string `json:"description"`
+	Creation     *string `json:"creation"`
+	LastDiscover *string `json:"last_discover"`
 }
 
-type DevicePoeStatus struct {
-	PoeDisabledPorts   int    `json:"poe_disabled_ports"`
-	PoePowerCommitted  string `json:"poe_power_committed"`
-	PoeCapablePorts    int    `json:"poe_capable_ports"`
-	Name               string `json:"name"`
-	Model              string `json:"model"`
-	PoePoweredPorts    int    `json:"poe_powered_ports"`
-	PoePowerDelivering string `json:"poe_power_delivering"`
-	PoeErroredPorts    int    `json:"poe_errored_ports"`
-	Location           string `json:"location"`
-	DNS                string `json:"dns"`
-	IP                 string `json:"ip"`
-	Module             int    `json:"module"`
-	Power              int    `json:"power"`
-	Status             string `json:"status"`
+// DeviceModule describes an inventory module.
+type DeviceModule struct {
+	IP           string  `json:"ip"`
+	Index        int64   `json:"index"`
+	Description  *string `json:"description"`
+	Type         *string `json:"type"`
+	Parent       *int64  `json:"parent"`
+	Name         *string `json:"name"`
+	Class        *string `json:"class"`
+	Position     *int64  `json:"pos"`
+	HWVersion    *string `json:"hw_ver"`
+	FWVersion    *string `json:"fw_ver"`
+	SWVersion    *string `json:"sw_ver"`
+	Serial       *string `json:"serial"`
+	Model        *string `json:"model"`
+	FRU          *bool   `json:"fru"`
+	Creation     *string `json:"creation"`
+	LastDiscover *string `json:"last_discover"`
 }
 
-type PortUtilization struct {
-	IP            string `json:"ip"`
-	PortsInUse    int    `json:"ports_in_use"`
-	PortsShutdown int    `json:"ports_shutdown"`
-	PortCount     int    `json:"port_count"`
-	PortsFree     int    `json:"ports_free"`
-	DNS           string `json:"dns"`
+// DevicePowerModule combines a power module with its aggregated port data.
+type DevicePowerModule struct {
+	PoEStats
+	IP     string  `json:"ip"`
+	Module int64   `json:"module"`
+	Power  *int64  `json:"power"`
+	Status *string `json:"status"`
 }
 
-type NodeIPCount struct {
-	Name    string `json:"name"`
-	Vendor  string `json:"vendor"`
-	Mac     string `json:"mac"`
-	IPCount int    `json:"ip_count"`
-	DNS     string `json:"dns"`
+// DevicePort is a physical or logical port. VLAN and speed remain text as
+// returned by Netdisco; PVID is the separate numeric VLAN identifier.
+type DevicePort struct {
+	IP               string     `json:"ip"`
+	Port             string     `json:"port"`
+	Creation         *string    `json:"creation"`
+	FirstSeen        *string    `json:"first_seen"`
+	Description      *string    `json:"descr"`
+	Up               *string    `json:"up"`
+	UpAdmin          *string    `json:"up_admin"`
+	Type             *string    `json:"type"`
+	Duplex           *string    `json:"duplex"`
+	DuplexAdmin      *string    `json:"duplex_admin"`
+	Speed            *string    `json:"speed"`
+	SpeedAdmin       *string    `json:"speed_admin"`
+	Name             *string    `json:"name"`
+	MAC              *string    `json:"mac"`
+	MTU              *int64     `json:"mtu"`
+	STP              *string    `json:"stp"`
+	RemoteIP         *string    `json:"remote_ip"`
+	RemotePort       *string    `json:"remote_port"`
+	RemoteType       *string    `json:"remote_type"`
+	RemoteID         *string    `json:"remote_id"`
+	HasSubinterfaces bool       `json:"has_subinterfaces"`
+	IsMaster         bool       `json:"is_master"`
+	SlaveOf          *string    `json:"slave_of"`
+	ManualTopology   bool       `json:"manual_topo"`
+	IsUplink         *bool      `json:"is_uplink"`
+	VLAN             *string    `json:"vlan"`
+	PVID             *int64     `json:"pvid"`
+	LastChange       *int64     `json:"lastchange"`
+	CustomFields     JSONFields `json:"custom_fields"`
+	Tags             []string   `json:"tags"`
+}
+
+// DevicePortVLAN associates a port with a tagged or untagged VLAN.
+type DevicePortVLAN struct {
+	IP           string  `json:"ip"`
+	Port         string  `json:"port"`
+	VLAN         int64   `json:"vlan"`
+	Native       bool    `json:"native"`
+	EgressTag    bool    `json:"egress_tag"`
+	Creation     *string `json:"creation"`
+	LastDiscover *string `json:"last_discover"`
+	VLANType     *string `json:"vlantype"`
+}
+
+// DevicePortWireless describes radio channel and power settings.
+type DevicePortWireless struct {
+	IP      string `json:"ip"`
 	Port    string `json:"port"`
-	Switch  string `json:"switch"`
+	Channel *int64 `json:"channel"`
+	Power   *int64 `json:"power"`
 }
 
-type PortHalfDuplex struct {
-	IP     string `json:"ip"`
-	Device Device `json:"device"`
-	Duplex string `json:"duplex"`
-	Port   string `json:"port"`
-	Name   string `json:"name"`
+// DevicePortSSID is one BSSID on a wireless port; a port can have many.
+type DevicePortSSID struct {
+	IP        string  `json:"ip"`
+	Port      string  `json:"port"`
+	SSID      *string `json:"ssid"`
+	Broadcast *bool   `json:"broadcast"`
+	BSSID     string  `json:"bssid"`
 }
 
-type PortAdminDown struct {
-	IP          string `json:"ip"`
-	DNS         string `json:"dns"`
-	Port        string `json:"port"`
-	Description string `json:"description"`
-	Name        string `json:"name"`
-	UpAdmin     string `json:"up_admin"`
+// DevicePortPower is an individual port's PoE state. Admin is text.
+type DevicePortPower struct {
+	IP     string  `json:"ip"`
+	Port   string  `json:"port"`
+	Module *int64  `json:"module"`
+	Admin  *string `json:"admin"`
+	Status *string `json:"status"`
+	Class  *string `json:"class"`
+	Power  *int64  `json:"power"`
 }
 
-type PortMultiNodes struct {
-	MacCount    int    `json:"mac_count"`
-	Description string `json:"description"`
-	Name        string `json:"name"`
-	IP          string `json:"ip"`
-	DNS         string `json:"dns"`
-	Port        string `json:"port"`
+// DevicePortProperties contains discovery and port access authentication data.
+type DevicePortProperties struct {
+	IP                   string  `json:"ip"`
+	Port                 string  `json:"port"`
+	ErrorDisableCause    *string `json:"error_disable_cause"`
+	RemoteIsDiscoverable *bool   `json:"remote_is_discoverable"`
+	RemoteIsWAP          *bool   `json:"remote_is_wap"`
+	RemoteIsPhone        *bool   `json:"remote_is_phone"`
+	RemoteVendor         *string `json:"remote_vendor"`
+	RemoteModel          *string `json:"remote_model"`
+	RemoteOSVersion      *string `json:"remote_os_ver"`
+	RemoteSerial         *string `json:"remote_serial"`
+	RemoteDNS            *string `json:"remote_dns"`
+	RawSpeed             *int64  `json:"raw_speed"`
+	FastStart            *bool   `json:"faststart"`
+	IfIndex              *int64  `json:"ifindex"`
+	PAEAuthConfigState   *string `json:"pae_authconfig_state"`
+	PAEPortControl       *string `json:"pae_authconfig_port_control"`
+	PAEPortStatus        *string `json:"pae_authconfig_port_status"`
+	PAESessionUser       *string `json:"pae_authsess_user"`
+	PAESessionMAB        *string `json:"pae_authsess_mab"`
+	PAELastEAPOLSource   *string `json:"pae_last_eapol_frame_source"`
+	PAEIsAuthenticator   *bool   `json:"pae_is_authenticator"`
+	PAEIsSupplicant      *bool   `json:"pae_is_supplicant"`
 }
 
-type PortErrorDisabled struct {
-	DNS    string `json:"dns"`
-	Name   string `json:"name"`
-	Port   string `json:"port"`
-	Reason string `json:"reason"`
-	IP     string `json:"ip"`
+// DevicePortLog is an audit entry for a port.
+type DevicePortLog struct {
+	ID       int64   `json:"id"`
+	IP       *string `json:"ip"`
+	Port     *string `json:"port"`
+	Reason   *string `json:"reason"`
+	Log      *string `json:"log"`
+	Username *string `json:"username"`
+	UserIP   *string `json:"userip"`
+	Action   *string `json:"action"`
+	Creation *string `json:"creation"`
 }
 
-type PortVlanMismatch struct {
-	RightDevice string `json:"right_device"`
-	RightPort   string `json:"right_port"`
-	LeftVlans   string `json:"left_vlans"`
-	LeftPort    string `json:"left_port"`
-	LeftDevice  string `json:"left_device"`
-	RightVlans  string `json:"right_vlans"`
+// Node is a MAC sighting, identified by MAC, switch, port and text VLAN.
+// Included relations are nil when not requested; lists requested without
+// matches decode to empty slices. Context fields are opt-in.
+type Node struct {
+	NodePortContext
+	MAC          string         `json:"mac"`
+	Switch       string         `json:"switch"`
+	Port         string         `json:"port"`
+	VLAN         string         `json:"vlan"`
+	Active       *bool          `json:"active"`
+	TimeFirst    *string        `json:"time_first"`
+	TimeRecent   *string        `json:"time_recent"`
+	TimeLast     *string        `json:"time_last"`
+	Wireless     []NodeWireless `json:"wireless,omitempty"`
+	IPs          []NodeIP       `json:"ips,omitempty"`
+	NetBIOS      *NodeNetBIOS   `json:"netbios,omitempty"`
+	Manufacturer *Manufacturer  `json:"manufacturer,omitempty"`
+}
+
+// NodePortContext is optional topology context supplied by the server.
+type NodePortContext struct {
+	PortIsUplink      *bool   `json:"port_is_uplink,omitempty"`
+	PortRemoteIP      *string `json:"port_remote_ip,omitempty"`
+	PortIsMaster      *bool   `json:"port_is_master,omitempty"`
+	PortSlaveOf       *string `json:"port_slave_of,omitempty"`
+	PortRemoteIsWAP   *bool   `json:"port_remote_is_wap,omitempty"`
+	PortRemoteIsPhone *bool   `json:"port_remote_is_phone,omitempty"`
+	LAGRemoteIP       *string `json:"lag_remote_ip,omitempty"`
+	NeighborIsDevice  *bool   `json:"neighbor_is_device,omitempty"`
+	PortMACCount      *int64  `json:"port_mac_count,omitempty"`
+}
+
+// NodeWithAge includes a server-formatted age, not a machine duration.
+type NodeWithAge struct {
+	Node
+	TimeLastAge *string `json:"time_last_age"`
+}
+
+// LastNode is the latest sighting on a port, including the legacy OUI column.
+type LastNode struct {
+	Node
+	OUI *string `json:"oui"`
+}
+
+// NodeIP associates a node's MAC with an IP and VRF.
+type NodeIP struct {
+	MAC               string     `json:"mac"`
+	IP                string     `json:"ip"`
+	DNS               *string    `json:"dns"`
+	Active            *bool      `json:"active"`
+	TimeFirst         *string    `json:"time_first"`
+	TimeLast          *string    `json:"time_last"`
+	SeenOnRouterFirst JSONFields `json:"seen_on_router_first"`
+	SeenOnRouterLast  JSONFields `json:"seen_on_router_last"`
+	VRF               string     `json:"vrf"`
+}
+
+// NodeNetBIOS is cached NetBIOS data for a MAC address.
+type NodeNetBIOS struct {
+	MAC       string  `json:"mac"`
+	IP        *string `json:"ip"`
+	Name      *string `json:"nbname"`
+	Domain    *string `json:"domain"`
+	Server    *bool   `json:"server"`
+	User      *string `json:"nbuser"`
+	Active    *bool   `json:"active"`
+	TimeFirst *string `json:"time_first"`
+	TimeLast  *string `json:"time_last"`
+}
+
+// NodeWireless contains measurements for one node MAC and SSID.
+type NodeWireless struct {
+	MAC            string  `json:"mac"`
+	SSID           string  `json:"ssid"`
+	Uptime         *int64  `json:"uptime"`
+	MaxRate        *int64  `json:"maxrate"`
+	TXRate         *int64  `json:"txrate"`
+	SignalStrength *int64  `json:"sigstrength"`
+	SignalQuality  *int64  `json:"sigqual"`
+	RXPackets      *int64  `json:"rxpkt"`
+	TXPackets      *int64  `json:"txpkt"`
+	RXBytes        *int64  `json:"rxbyte"`
+	TXBytes        *int64  `json:"txbyte"`
+	TimeLast       *string `json:"time_last"`
+}
+
+// Manufacturer is an address-prefix registration. Range retains PostgreSQL's
+// textual int8range representation.
+type Manufacturer struct {
+	Company *string `json:"company"`
+	Abbrev  *string `json:"abbrev"`
+	Base    string  `json:"base"`
+	Bits    *int64  `json:"bits"`
+	First   *string `json:"first"`
+	Last    *string `json:"last"`
+	Range   *string `json:"range"`
+}
+
+// NeighborMap preserves Netdisco's topology response. Links can refer to
+// devices absent from Nodes after the server applies its filters.
+type NeighborMap struct {
+	Data       NeighborMapData `json:"data"`
+	NumSizes   int64           `json:"numsizes"`
+	NewNodes   *int64          `json:"newnodes,omitempty"`
+	CenterNode *string         `json:"centernode,omitempty"`
+}
+
+// NeighborMapData contains unmodified topology nodes and links.
+type NeighborMapData struct {
+	Nodes []NeighborMapNode `json:"nodes"`
+	Links []NeighborMapLink `json:"links"`
+}
+
+// NeighborMapNode is the map's presentation record, not an inventory Device.
+// ColorValue, X and Y preserve numeric or string JSON exactly. InfoString is
+// server-generated HTML; callers must choose their own rendering policy.
+type NeighborMapNode struct {
+	ID            string          `json:"ID"`
+	SizeValue     float64         `json:"SIZEVALUE"`
+	ColorValue    json.RawMessage `json:"COLORVALUE,omitempty"`
+	Label         string          `json:"LABEL"`
+	OriginalLabel string          `json:"ORIG_LABEL"`
+	InfoString    string          `json:"INFOSTRING"`
+	Link          string          `json:"LINK"`
+	Fixed         *int64          `json:"fixed,omitempty"`
+	X             json.RawMessage `json:"x,omitempty"`
+	Y             json.RawMessage `json:"y,omitempty"`
+}
+
+// NeighborMapLink represents a deduplicated link between device IPs.
+type NeighborMapLink struct {
+	FromID     string `json:"FROMID"`
+	ToID       string `json:"TOID"`
+	InfoString string `json:"INFOSTRING"`
+	Speed      string `json:"SPEED"`
 }

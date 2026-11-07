@@ -1,0 +1,9 @@
+{
+  "version": "2.117002",
+  "commit": "29324b9b89be895d12cb2614143fc14c4b61ae88",
+  "swagger_source": "https://netdisco-demo-jyxhs.ondigitalocean.app/swagger.json",
+  "retrieved_at": "2026-11-07T16:22:14.311940+00:00",
+  "swagger_sha256": "2ef9d2e4f186f3e56a5dced889d10558eafeb51b593df543ef6a992bbbe5e7e6",
+  "operation_count": 79,
+  "note": "Official demo matches the pinned release. Snapshot is independent of the Go implementation. Dynamic default dateranges reflect capture time and are not client defaults."
+}

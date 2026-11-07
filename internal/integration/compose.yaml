@@ -1,0 +1,61 @@
+x-netdisco: &netdisco
+  NETDISCO_HOME: /home/netdisco
+  NETDISCO_DB_HOST: postgres
+  NETDISCO_DB_NAME: netdisco
+  NETDISCO_DB_USER: netdisco
+  NETDISCO_DB_PASS: fixture-password
+  NETDISCO_CURRENT_PG_VERSION: '18'
+services:
+  postgres:
+    image: netdisco/netdisco:2.117002-postgresql@sha256:0d4bbd14d6bb870bab449560eef8cdfbefb356f279423a7709609cd865a5cf6a
+    environment:
+      <<: *netdisco
+    volumes:
+      - database:/var/lib/postgresql
+      - ./tenant.sql:/docker-entrypoint-initdb.d/zz-tenant.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U netdisco -d netdisco']
+      interval: 1s
+      timeout: 3s
+      retries: 60
+  initialize:
+    image: netdisco/netdisco:2.117002-backend@sha256:12498473d0e88c89216ebe5c2c21bf4c9718e1643acffa1ad6ee9126be58e5a8
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - |
+        netdisco-db-deploy
+        NETDISCO_DB_NAME=netdisco_tenant netdisco-db-deploy
+        netdisco-env perl /fixtures/seed.pl
+    environment:
+      <<: *netdisco
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./deployment.yml:/home/netdisco/environments/deployment.yml:ro
+      - ./seed.pl:/fixtures/seed.pl:ro
+  web:
+    image: netdisco/netdisco:2.117002-web@sha256:7c9db3a44f535efd147e436927dbedf1b4a6c1ce09bce26b91ad7ef21806cff2
+    command: [foreground, '--workers=1']
+    environment:
+      <<: *netdisco
+      IPV: '4'
+      PORT: '5000'
+    depends_on:
+      initialize:
+        condition: service_completed_successfully
+    ports:
+      - '127.0.0.1::5000'
+    volumes:
+      - ./deployment.yml:/home/netdisco/environments/deployment.yml:ro
+    healthcheck:
+      test: [CMD-SHELL, 'curl -fsS http://127.0.0.1:5000/health >/dev/null']
+      interval: 1s
+      timeout: 3s
+      retries: 60
+networks:
+  default:
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: 'false'
+volumes:
+  database:

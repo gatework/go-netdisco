@@ -1,0 +1,13 @@
+{
+  "captured_at": "2026-11-07T16:30:47.503977+00:00",
+  "requests": {
+    "report-ap-channel-distribution": "/api/v1/report/wireless/apchanneldist",
+    "report-ap-clients": "/api/v1/report/wireless/apclients",
+    "report-ap-radio-channel-power": "/api/v1/report/wireless/apradiochannelpower",
+    "report-ssid-ports": "/api/v1/report/port/portssid?ssid=fixture-wifi",
+    "search-port-vlan": "/api/v1/search/port?q=100",
+    "search-vlan": "/api/v1/search/vlan?q=100"
+  },
+  "source": "Pinned local Docker image with internal/integration/seed.pl synthetic data",
+  "version": "2.117002"
+}

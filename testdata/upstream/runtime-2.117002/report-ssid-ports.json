@@ -1,0 +1,17 @@
+[
+  {
+    "broadcast": 1,
+    "bssid": "02:00:00:00:10:01",
+    "device": {
+      "dns": "switch-a.invalid",
+      "model": "fixture-switch",
+      "name": "switch-a",
+      "vendor": "fixture-vendor"
+    },
+    "ip": "192.0.2.10",
+    "port": {
+      "port": "Radio0"
+    },
+    "ssid": "fixture-wifi"
+  }
+]

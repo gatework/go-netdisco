@@ -1,0 +1,397 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}",
+    "category": "Objects"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/v1/object/device/{ip}/arps",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/device_ips",
+    "category": "Objects"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/v1/object/device/{ip}/jobs",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/modules",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/neighbors",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/nodes",
+    "category": "Objects"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/v1/object/device/{ip}/nodes",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/active_nodes",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/active_nodes_with_age",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/agg_master",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/last_node",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/logs",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/neighbor",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/nodes",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/nodes_with_age",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/port_vlans",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/power",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/properties",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/ssid",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/vlans",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port/{port}/wireless",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/port_vlans",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/ports",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/power_modules",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/powered_ports",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/ssids",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/vlans",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/device/{ip}/wireless_ports",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/object/vlan/{vlan}/nodes",
+    "category": "Objects"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/queue/backends",
+    "category": "Queue"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/v1/queue/jobs",
+    "category": "Queue"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/queue/jobs",
+    "category": "Queue"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/queue/jobs",
+    "category": "Queue"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/queue/status",
+    "category": "Queue"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/deviceaddrnodns",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/devicebylocation",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/devicednsmismatch",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/deviceinventory",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/devicemultipleaddresses",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/devicepoestatus",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/devicesharedaddresses",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/devicesmissingmodeloros",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/portutilization",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/device/recentlyaddeddevices",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/ip/duplicateprivatenetworks",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/ip/ipinventory",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/ip/subnets",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/node/nodemultiips",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/node/nodesdiscovered",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/port/duplexmismatch",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/port/halfduplex",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/port/portadmindown",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/port/portblocking",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/port/portmultinodes",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/port/portserrordisabled",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/port/portssid",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/port/portswithmostvlans",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/port/portvlanmismatch",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/vlan/devicevlancount",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/vlan/vlaninventory",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/vlan/vlanmultiplenames",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/vlan/vlansneverconfigured",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/vlan/vlansonlyuplinks",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/vlan/vlansunused",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/wireless/apchanneldist",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/wireless/apclients",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/wireless/apradiochannelpower",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/report/wireless/ssidinventory",
+    "category": "Reports"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/search/device",
+    "category": "Search"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/search/node",
+    "category": "Search"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/search/port",
+    "category": "Search"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/search/vlan",
+    "category": "Search"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/statistics",
+    "category": "General"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/user",
+    "category": "User"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/users",
+    "category": "User"
+  },
+  {
+    "method": "POST",
+    "path": "/login",
+    "category": "General"
+  },
+  {
+    "method": "GET",
+    "path": "/logout",
+    "category": "General"
+  }
+]

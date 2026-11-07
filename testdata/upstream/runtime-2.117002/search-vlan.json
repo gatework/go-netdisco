@@ -1,0 +1,26 @@
+[
+  {
+    "dns": "switch-a.invalid",
+    "ip": "192.0.2.10",
+    "model": "fixture-switch",
+    "os": "fixture-os",
+    "pcount": 4,
+    "vendor": "fixture-vendor",
+    "vlans": {
+      "description": "fixture-vlan",
+      "vlan": 100
+    }
+  },
+  {
+    "dns": "switch-b.invalid",
+    "ip": "192.0.2.11",
+    "model": "fixture-switch",
+    "os": null,
+    "pcount": 0,
+    "vendor": "fixture-vendor",
+    "vlans": {
+      "description": "fixture-vlan",
+      "vlan": 100
+    }
+  }
+]

@@ -1,0 +1,2081 @@
+{
+  "consumes": "application/json",
+  "info": {
+    "description": "",
+    "title": "App::Netdisco",
+    "version": "2.117002"
+  },
+  "paths": {
+    "/api/v1/object/device/{ip}": {
+      "get": {
+        "description": "Returns a row from the device table",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/arps": {
+      "put": {
+        "description": "Queue a job to store the ARP entries found on a given Device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "default": "[]",
+            "description": "List of arp tuples (MAC, IP, DNS?). IPs will be resolved to FQDN by Netdisco.",
+            "in": "body",
+            "name": "arps",
+            "schema": {
+              "items": {
+                "properties": {
+                  "dns": {
+                    "required": 0,
+                    "type": "string"
+                  },
+                  "ip": {
+                    "required": 1,
+                    "type": "string"
+                  },
+                  "mac": {
+                    "required": 1,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/device_ips": {
+      "get": {
+        "description": "Returns device_ips rows for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/jobs": {
+      "delete": {
+        "description": "Delete jobs and clear skiplist for a device, optionally filtered by fields",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Port field of the Job",
+            "in": "query",
+            "name": "port",
+            "type": "string"
+          },
+          {
+            "description": "Action field of the Job",
+            "in": "query",
+            "name": "action",
+            "type": "string"
+          },
+          {
+            "description": "Status field of the Job",
+            "in": "query",
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "description": "Username of the Job submitter",
+            "in": "query",
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "description": "IP address of the Job submitter",
+            "in": "query",
+            "name": "userip",
+            "type": "string"
+          },
+          {
+            "description": "Backend instance assigned the Job",
+            "in": "query",
+            "name": "backend",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/modules": {
+      "get": {
+        "description": "Returns modules rows for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/neighbors": {
+      "get": {
+        "description": "Returns layer 2 neighbor relation data for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "default": "depth",
+            "description": "Scope of results, either \"all\", \"cloud\" (LLDP cloud), or \"depth\" (uses hops)",
+            "in": "query",
+            "name": "scope",
+            "type": "string"
+          },
+          {
+            "default": "1",
+            "description": "When specifying Scope \"depth\", this is the number of hops",
+            "in": "query",
+            "name": "hops",
+            "type": "string"
+          },
+          {
+            "description": "Limit results to devices carrying this numeric VLAN ID",
+            "in": "query",
+            "name": "vlan",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/nodes": {
+      "get": {
+        "description": "Returns the nodes found on a given Device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "default": "true",
+            "description": "Restrict results to active Nodes only",
+            "in": "query",
+            "name": "active_only",
+            "type": "boolean"
+          },
+          {
+            "description": "Comma-separated list of related rows to embed in each Node: wireless (node_wireless - SSID, signal, rates), ips (node_ip), netbios (node_nbt), manufacturer (vendor from the OUI). Omitted by default.",
+            "in": "query",
+            "name": "include",
+            "type": "string"
+          },
+          {
+            "default": "false",
+            "description": "Include topology context of each Node's switch port (uplink, neighbor, LAG, node count)",
+            "in": "query",
+            "name": "port_context",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      },
+      "put": {
+        "description": "Queue a job to store the nodes found on a given Device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "default": "[]",
+            "description": "List of node tuples (port, VLAN, MAC)",
+            "in": "body",
+            "name": "nodes",
+            "schema": {
+              "items": {
+                "properties": {
+                  "mac": {
+                    "type": "string"
+                  },
+                  "port": {
+                    "type": "string"
+                  },
+                  "vlan": {
+                    "default": "1",
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}": {
+      "get": {
+        "description": "Returns a row from the device_port table",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/active_nodes": {
+      "get": {
+        "description": "Returns active_nodes rows for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/active_nodes_with_age": {
+      "get": {
+        "description": "Returns active_nodes_with_age rows for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/agg_master": {
+      "get": {
+        "description": "Returns the related agg_master table entry for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/last_node": {
+      "get": {
+        "description": "Returns the related last_node table entry for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/logs": {
+      "get": {
+        "description": "Returns logs rows for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/neighbor": {
+      "get": {
+        "description": "Returns the related neighbor table entry for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/nodes": {
+      "get": {
+        "description": "Returns nodes rows for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/nodes_with_age": {
+      "get": {
+        "description": "Returns nodes_with_age rows for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/port_vlans": {
+      "get": {
+        "description": "Returns port_vlans rows for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/power": {
+      "get": {
+        "description": "Returns the related power table entry for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/properties": {
+      "get": {
+        "description": "Returns the related properties table entry for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/ssid": {
+      "get": {
+        "description": "Returns ssid rows for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/vlans": {
+      "get": {
+        "description": "Returns vlans rows for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port/{port}/wireless": {
+      "get": {
+        "description": "Returns the related wireless table entry for a given port",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "description": "Name of the port. Use the \".../device/{ip}/ports\" method to find these.",
+            "in": "path",
+            "name": "port",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/port_vlans": {
+      "get": {
+        "description": "Returns port_vlans rows for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/ports": {
+      "get": {
+        "description": "Returns ports rows for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/power_modules": {
+      "get": {
+        "description": "Returns PoE module status and aggregated port statistics for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/powered_ports": {
+      "get": {
+        "description": "Returns powered_ports rows for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/ssids": {
+      "get": {
+        "description": "Returns ssids rows for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/vlans": {
+      "get": {
+        "description": "Returns vlans rows for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/device/{ip}/wireless_ports": {
+      "get": {
+        "description": "Returns wireless_ports rows for a given device",
+        "parameters": [
+          {
+            "description": "Canonical IP of the Device. Use Search methods to find this.",
+            "in": "path",
+            "name": "ip",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/object/vlan/{vlan}/nodes": {
+      "get": {
+        "description": "Returns the nodes found in a given VLAN",
+        "parameters": [
+          {
+            "description": "VLAN number",
+            "in": "path",
+            "name": "vlan",
+            "required": 1,
+            "type": "integer"
+          },
+          {
+            "default": "true",
+            "description": "Restrict results to active Nodes only",
+            "in": "query",
+            "name": "active_only",
+            "type": "boolean"
+          },
+          {
+            "description": "Comma-separated list of related rows to embed in each Node: wireless (node_wireless - SSID, signal, rates), ips (node_ip), netbios (node_nbt), manufacturer (vendor from the OUI). Omitted by default.",
+            "in": "query",
+            "name": "include",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Objects"
+        ]
+      }
+    },
+    "/api/v1/queue/backends": {
+      "get": {
+        "description": "Return list of currently active backend names (usually FQDN)",
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Queue"
+        ]
+      }
+    },
+    "/api/v1/queue/jobs": {
+      "delete": {
+        "description": "Delete jobs and skiplist entries, optionally filtered by fields",
+        "parameters": [
+          {
+            "description": "IP address field of the Job",
+            "in": "query",
+            "name": "device",
+            "type": "string"
+          },
+          {
+            "description": "Port field of the Job",
+            "in": "query",
+            "name": "port",
+            "type": "string"
+          },
+          {
+            "description": "Action field of the Job",
+            "in": "query",
+            "name": "action",
+            "type": "string"
+          },
+          {
+            "description": "Status field of the Job",
+            "in": "query",
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "description": "Username of the Job submitter",
+            "in": "query",
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "description": "IP address of the Job submitter",
+            "in": "query",
+            "name": "userip",
+            "type": "string"
+          },
+          {
+            "description": "Backend instance assigned the Job",
+            "in": "query",
+            "name": "backend",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Queue"
+        ]
+      },
+      "get": {
+        "description": "Return jobs in the queue, optionally filtered by fields",
+        "parameters": [
+          {
+            "default": "50",
+            "description": "Maximum number of Jobs to return",
+            "in": "query",
+            "name": "limit",
+            "type": "integer"
+          },
+          {
+            "description": "IP address field of the Job",
+            "in": "query",
+            "name": "device",
+            "type": "string"
+          },
+          {
+            "description": "Port field of the Job",
+            "in": "query",
+            "name": "port",
+            "type": "string"
+          },
+          {
+            "description": "Action field of the Job",
+            "in": "query",
+            "name": "action",
+            "type": "string"
+          },
+          {
+            "description": "Status field of the Job",
+            "in": "query",
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "description": "Username of the Job submitter",
+            "in": "query",
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "description": "IP address of the Job submitter",
+            "in": "query",
+            "name": "userip",
+            "type": "string"
+          },
+          {
+            "description": "Backend instance assigned the Job",
+            "in": "query",
+            "name": "backend",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Queue"
+        ]
+      },
+      "post": {
+        "description": "Submit jobs to the queue",
+        "parameters": [
+          {
+            "default": "[]",
+            "description": "List of job specifications (action, device?, port?, extra?).",
+            "in": "body",
+            "name": "jobs",
+            "schema": {
+              "items": {
+                "properties": {
+                  "action": {
+                    "description": "Job action. Unknown actions are accepted but will fail silently in the backend.",
+                    "required": 1,
+                    "type": "string"
+                  },
+                  "device": {
+                    "required": 0,
+                    "type": "string"
+                  },
+                  "extra": {
+                    "description": "Optional job parameter.",
+                    "required": 0,
+                    "type": "string"
+                  },
+                  "port": {
+                    "required": 0,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Queue"
+        ]
+      }
+    },
+    "/api/v1/queue/status": {
+      "get": {
+        "description": "Return counts of jobs by status. queued/running reflect current state; done/failed are optionally scoped by since.",
+        "parameters": [
+          {
+            "description": "Limit done/failed counts to jobs finished within this duration. Examples: 1h, 30m, 2d. Default: all time.",
+            "in": "query",
+            "name": "since",
+            "required": 0,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Queue"
+        ]
+      }
+    },
+    "/api/v1/report/device/deviceaddrnodns": {
+      "get": {
+        "description": "IPs without DNS Entries Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/device/devicebylocation": {
+      "get": {
+        "description": "Inventory by Location Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/device/devicednsmismatch": {
+      "get": {
+        "description": "Device Name / DNS Mismatches Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/device/deviceinventory": {
+      "get": {
+        "description": "Device Inventory Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/device/devicemultipleaddresses": {
+      "get": {
+        "description": "Devices with Multiple Addresses Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/device/devicepoestatus": {
+      "get": {
+        "description": "Power over Ethernet (PoE) Status Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/device/devicesharedaddresses": {
+      "get": {
+        "description": "IPs on Multiple Devices Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/device/devicesmissingmodeloros": {
+      "get": {
+        "description": "Devices missing Model or OS Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/device/portutilization": {
+      "get": {
+        "description": "Port Utilization Report",
+        "parameters": [
+          {
+            "default": "3",
+            "description": "Mark as Free if down for (quantity)",
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31
+            ],
+            "in": "query",
+            "name": "age_num",
+            "type": "string"
+          },
+          {
+            "default": "months",
+            "description": "Mark as Free if down for (period)",
+            "enum": [
+              "days",
+              "weeks",
+              "months",
+              "years"
+            ],
+            "in": "query",
+            "name": "age_unit",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/device/recentlyaddeddevices": {
+      "get": {
+        "description": "Recently Added Devices Report",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "since",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/ip/duplicateprivatenetworks": {
+      "get": {
+        "description": "Duplicate Private Networks Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/ip/ipinventory": {
+      "get": {
+        "description": "IP Inventory Report",
+        "parameters": [
+          {
+            "description": "IP Prefix to search",
+            "in": "query",
+            "name": "subnet",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "default": "1970-01-01 to 2026-11-07",
+            "description": "Date range to search",
+            "in": "query",
+            "name": "daterange",
+            "type": "string"
+          },
+          {
+            "default": "false",
+            "description": "Results should NOT be within daterange",
+            "in": "query",
+            "name": "age_invert",
+            "type": "boolean"
+          },
+          {
+            "default": "2048",
+            "description": "Maximum number of historical records",
+            "enum": [
+              "32",
+              "64",
+              "128",
+              "256",
+              "512",
+              "1024",
+              "2048",
+              "4096",
+              "8192"
+            ],
+            "in": "query",
+            "name": "limit",
+            "type": "string"
+          },
+          {
+            "default": "false",
+            "description": "Include in the report IPs never seen",
+            "in": "query",
+            "name": "never",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/ip/subnets": {
+      "get": {
+        "description": "Subnet Utilization Report",
+        "parameters": [
+          {
+            "default": "0.0.0.0/32",
+            "description": "IP Prefix to search",
+            "in": "query",
+            "name": "subnet",
+            "type": "string"
+          },
+          {
+            "default": "1970-01-01 to 2026-11-07",
+            "description": "Date range to search",
+            "in": "query",
+            "name": "daterange",
+            "type": "string"
+          },
+          {
+            "default": "false",
+            "description": "Results should NOT be within daterange",
+            "in": "query",
+            "name": "age_invert",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/node/nodemultiips": {
+      "get": {
+        "description": "Nodes with multiple active IP addresses Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/node/nodesdiscovered": {
+      "get": {
+        "description": "Nodes discovered through LLDP/CDP Report",
+        "parameters": [
+          {
+            "description": "Host Name reported",
+            "in": "query",
+            "name": "remote_id",
+            "type": "string"
+          },
+          {
+            "description": "Platform reported",
+            "in": "query",
+            "name": "remote_type",
+            "type": "string"
+          },
+          {
+            "default": "false",
+            "description": "Include Wireless APs in the report",
+            "in": "query",
+            "name": "aps",
+            "type": "boolean"
+          },
+          {
+            "default": "false",
+            "description": "Include IP Phones in the report",
+            "in": "query",
+            "name": "phones",
+            "type": "boolean"
+          },
+          {
+            "default": "false",
+            "description": "Match all parameters (true) or any (false)",
+            "in": "query",
+            "name": "matchall",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/port/duplexmismatch": {
+      "get": {
+        "description": "Mismatched Duplex Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/port/halfduplex": {
+      "get": {
+        "description": "Ports in Half Duplex Mode Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/port/portadmindown": {
+      "get": {
+        "description": "Ports Administratively Disabled Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/port/portblocking": {
+      "get": {
+        "description": "Blocked - Spanning Tree Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/port/portmultinodes": {
+      "get": {
+        "description": "Ports with multiple nodes attached Report",
+        "parameters": [
+          {
+            "description": "Filter by VLAN",
+            "in": "query",
+            "name": "vlan",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/port/portserrordisabled": {
+      "get": {
+        "description": "Blocked - Error-Disabled Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/port/portssid": {
+      "get": {
+        "description": "Port SSID Inventory Report",
+        "parameters": [
+          {
+            "description": "Get details for this SSID",
+            "in": "query",
+            "name": "ssid",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/port/portswithmostvlans": {
+      "get": {
+        "description": "Ports with the most VLANs Report",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "threshold",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/port/portvlanmismatch": {
+      "get": {
+        "description": "Mismatched VLANs Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/vlan/devicevlancount": {
+      "get": {
+        "description": "VLAN Count per Device Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/vlan/vlaninventory": {
+      "get": {
+        "description": "VLAN Inventory Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/vlan/vlanmultiplenames": {
+      "get": {
+        "description": "VLANs With Multiple Names Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/vlan/vlansneverconfigured": {
+      "get": {
+        "description": "VLANs Known but Not Configured Report",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "chunk_size",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/vlan/vlansonlyuplinks": {
+      "get": {
+        "description": "VLANs Only On Uplinks Report",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "chunk_size",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/vlan/vlansunused": {
+      "get": {
+        "description": "VLANs No Longer Used Report",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "chunk_size",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/wireless/apchanneldist": {
+      "get": {
+        "description": "Access Point Channel Distribution Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/wireless/apclients": {
+      "get": {
+        "description": "Access Point Client Count Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/wireless/apradiochannelpower": {
+      "get": {
+        "description": "Access Point Radios Channel and Power Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/report/wireless/ssidinventory": {
+      "get": {
+        "description": "SSID Inventory Report",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/search/device": {
+      "get": {
+        "description": "Device Search",
+        "parameters": [
+          {
+            "description": "Partial match of Device contact, serial, chassis ID, module serials, location, name, description, dns, or any IP alias. Optional if \"limit\" and \"offset\" are both given, to return all devices.",
+            "in": "query",
+            "name": "q",
+            "type": "string"
+          },
+          {
+            "description": "Partial match of the Device name",
+            "in": "query",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "description": "Partial match of the Device location",
+            "in": "query",
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "description": "Partial match of any of the Device IP aliases",
+            "in": "query",
+            "name": "dns",
+            "type": "string"
+          },
+          {
+            "description": "IP or IP Prefix within which the Device must have an interface address",
+            "in": "query",
+            "name": "ip",
+            "type": "string"
+          },
+          {
+            "description": "Partial match of the Device description",
+            "in": "query",
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "description": "MAC Address of the Device or any of its Interfaces",
+            "in": "query",
+            "name": "mac",
+            "type": "string"
+          },
+          {
+            "description": "Exact match of the Device model",
+            "in": "query",
+            "name": "model",
+            "type": "string"
+          },
+          {
+            "description": "Exact match of the Device operating system",
+            "in": "query",
+            "name": "os",
+            "type": "string"
+          },
+          {
+            "description": "Exact match of the Device operating system version",
+            "in": "query",
+            "name": "os_ver",
+            "type": "string"
+          },
+          {
+            "description": "Exact match of the Device vendor",
+            "in": "query",
+            "name": "vendor",
+            "type": "string"
+          },
+          {
+            "description": "OSI Layer which the device must support",
+            "in": "query",
+            "name": "layers",
+            "type": "string"
+          },
+          {
+            "default": "false",
+            "description": "If true, all fields (except \"q\") must match the Device",
+            "in": "query",
+            "name": "matchall",
+            "type": "boolean"
+          },
+          {
+            "description": "Comma-separated list of fields to return. Default: ip,dns,name,location,model,os_ver,serial,chassis_id. Any Device table column except snmp_comm is valid (e.g. vendor,os,layers,last_discover,last_macsuck,last_arpnip), and any other name is an error. Each field is returned under the name you gave it. Use \"all\" for every column except snmp_comm, which is never returned. Extra join: device_auth_tag.",
+            "in": "query",
+            "name": "fields",
+            "type": "string"
+          },
+          {
+            "default": "false",
+            "description": "Deprecated, use fields=all instead. If true and \"fields\" is not given, all columns of the Device will be shown.",
+            "in": "query",
+            "name": "seeallcolumns",
+            "type": "boolean"
+          },
+          {
+            "description": "Maximum number of devices to return. Required, along with \"offset\", if neither \"q\" nor any filter parameter is given.",
+            "in": "query",
+            "name": "limit",
+            "type": "string"
+          },
+          {
+            "description": "Number of devices to skip (for paging). Default: 0.",
+            "in": "query",
+            "name": "offset",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/api/v1/search/node": {
+      "get": {
+        "description": "Node Search",
+        "parameters": [
+          {
+            "description": "MAC Address or IP Address or Hostname (without Domain Suffix) of a Node (supports SQL or \"*\" wildcards)",
+            "in": "query",
+            "name": "q",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "default": "false",
+            "description": "Partially match the \"q\" parameter (wildcard characters not required)",
+            "in": "query",
+            "name": "partial",
+            "type": "boolean"
+          },
+          {
+            "default": "true",
+            "description": "MAC Address search will include Device Port MACs",
+            "in": "query",
+            "name": "deviceports",
+            "type": "boolean"
+          },
+          {
+            "default": "false",
+            "description": "MAC Address search will include topology context of each sighting's switch port (uplink, neighbor, LAG, node count)",
+            "in": "query",
+            "name": "port_context",
+            "type": "boolean"
+          },
+          {
+            "default": "false",
+            "description": "Include interface Vendor in results",
+            "in": "query",
+            "name": "show_vendor",
+            "type": "boolean"
+          },
+          {
+            "default": "false",
+            "description": "Include archived records in results",
+            "in": "query",
+            "name": "archived",
+            "type": "boolean"
+          },
+          {
+            "default": "1970-01-01 to 2026-11-07",
+            "description": "Date Range in format \"YYYY-MM-DD to YYYY-MM-DD\"",
+            "in": "query",
+            "name": "daterange",
+            "type": "string"
+          },
+          {
+            "default": "false",
+            "description": "Results should NOT be within daterange",
+            "in": "query",
+            "name": "age_invert",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/api/v1/search/port": {
+      "get": {
+        "description": "Port Search",
+        "parameters": [
+          {
+            "description": "Port name, VLAN, or MAC address",
+            "in": "query",
+            "name": "q",
+            "required": 1,
+            "type": "string"
+          },
+          {
+            "default": "true",
+            "description": "Search for a partial match on parameter \"q\"",
+            "in": "query",
+            "name": "partial",
+            "type": "boolean"
+          },
+          {
+            "default": "false",
+            "description": "Include uplinks in results",
+            "in": "query",
+            "name": "uplink",
+            "type": "boolean"
+          },
+          {
+            "default": "false",
+            "description": "Search in the Port Description field",
+            "in": "query",
+            "name": "descr",
+            "type": "boolean"
+          },
+          {
+            "default": "true",
+            "description": "Only Ethernet type interfaces in results",
+            "in": "query",
+            "name": "ethernet",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/api/v1/search/vlan": {
+      "get": {
+        "description": "VLAN Search",
+        "parameters": [
+          {
+            "description": "VLAN name or number",
+            "in": "query",
+            "name": "q",
+            "required": 1,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/api/v1/statistics": {
+      "get": {
+        "description": "Returns the latest row from the statistics table",
+        "parameters": [],
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "General"
+        ]
+      }
+    },
+    "/api/v1/user": {
+      "post": {
+        "description": "Provision a service account and issue an API token. Creates the user if not present (null password, token-auth only). Idempotent.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "permanent": {
+                  "default": 0,
+                  "description": "Issue a non-expiring token (requires allow_permanent_tokens in config)",
+                  "type": "boolean"
+                },
+                "revoke": {
+                  "default": 0,
+                  "description": "Revoke the token instead of issuing one",
+                  "type": "boolean"
+                },
+                "token_acl": {
+                  "description": "Name of the Host Group ACL controlling the sources allowed to use this token (omit for no restriction)",
+                  "type": "string"
+                },
+                "username": {
+                  "description": "Username of the service account",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "username"
+              ],
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "examples": {
+              "application/json": {
+                "api_key": "cc9d5c02d8898e5728b7d7a0339c0785",
+                "permanent": 1,
+                "username": "grafana-svc"
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "description": "List all users with their roles and token status",
+        "responses": {
+          "default": {}
+        },
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/login": {
+      "post": {
+        "description": "Obtain an API Key",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "examples": {
+              "application/json": {
+                "api_key": "cc9d5c02d8898e5728b7d7a0339c0785"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BasicAuth": []
+          }
+        ],
+        "tags": [
+          "General"
+        ]
+      }
+    },
+    "/logout": {
+      "get": {
+        "description": "Destroy user API Key and session cookie",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "examples": {
+              "application/json": {}
+            }
+          }
+        },
+        "tags": [
+          "General"
+        ]
+      }
+    }
+  },
+  "produces": "application/json",
+  "security": [
+    {
+      "APIKeyHeader": []
+    }
+  ],
+  "securityDefinitions": {
+    "APIKeyHeader": {
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey"
+    },
+    "BasicAuth": {
+      "type": "basic"
+    }
+  },
+  "swagger": "2.0",
+  "tags": [
+    {
+      "description": "Log in/out and health checks",
+      "name": "General"
+    },
+    {
+      "description": "Search Operations",
+      "name": "Search"
+    },
+    {
+      "description": "Device, Port, and associated Node Data",
+      "name": "Objects"
+    },
+    {
+      "description": "Canned and Custom Reports",
+      "name": "Reports"
+    },
+    {
+      "description": "Operations on the Job Queue",
+      "name": "Queue"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "ip": "192.0.2.10",
+    "mac_count": 1,
+    "model": "fixture-switch",
+    "ports": {
+      "name": "fixture-port",
+      "port": "Radio0",
+      "type": "ieee80211"
+    }
+  }
+]

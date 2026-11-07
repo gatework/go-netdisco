@@ -1,0 +1,30 @@
+#!/bin/sh
+set -eu
+
+repo=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+project="go-netdisco-integration-$(date +%s)-$$"
+compose() {
+    docker compose -p "$project" -f "$repo/internal/integration/compose.yaml" "$@"
+}
+cleanup() {
+    result=$?
+    trap - EXIT HUP INT TERM
+    if [ "$result" -ne 0 ]; then
+        compose logs --tail 80 initialize web postgres >&2 || true
+    fi
+    compose down --volumes --remove-orphans >/dev/null || true
+    exit "$result"
+}
+trap cleanup EXIT
+trap 'exit 130' HUP INT TERM
+
+compose up -d --wait --wait-timeout 180
+version=$(compose exec -T web netdisco-env perl -MApp::Netdisco -e 'print $App::Netdisco::VERSION')
+if [ "$version" != 2.117002 ]; then
+    echo "Expected Netdisco 2.117002, got $version" >&2
+    exit 1
+fi
+address=$(compose port web 5000)
+export NETDISCO_INTEGRATION_URL="http://$address"
+cd "$repo"
+GOWORK=off go test -tags=integration -race -count=1 -timeout=5m -run '^TestIntegration' "$@" ./...

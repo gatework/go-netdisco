@@ -1,0 +1,50 @@
+[
+  {
+    "device": {
+      "dns": "switch-a.invalid",
+      "name": "switch-a"
+    },
+    "ip": "192.0.2.10",
+    "lastchange_stamp": null,
+    "name": "fixture-port",
+    "port": "Radio0",
+    "port_vlans": {
+      "vlan": 100
+    },
+    "speed": "1.0 G",
+    "up": "up",
+    "up_admin": "up"
+  },
+  {
+    "device": {
+      "dns": "switch-a.invalid",
+      "name": "switch-a"
+    },
+    "ip": "192.0.2.10",
+    "lastchange_stamp": null,
+    "name": "fixture-port",
+    "port": "Port-channel1",
+    "port_vlans": {
+      "vlan": 100
+    },
+    "speed": "1.0 G",
+    "up": "up",
+    "up_admin": "up"
+  },
+  {
+    "device": {
+      "dns": "switch-a.invalid",
+      "name": "switch-a"
+    },
+    "ip": "192.0.2.10",
+    "lastchange_stamp": null,
+    "name": "fixture-port",
+    "port": "Gi1/0/1",
+    "port_vlans": {
+      "vlan": 100
+    },
+    "speed": "1.0 G",
+    "up": "up",
+    "up_admin": "up"
+  }
+]

@@ -56,6 +56,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			if _, err := netdisco.New(tc.url, tc.opts...); err == nil {
 				t.Fatal("expected configuration error")
 			}
@@ -77,7 +78,7 @@ func TestClientPrefixTenantAndInjectedClient(t *testing.T) {
 		if r.Header.Get("Accept") != "application/json" {
 			t.Error("missing accept header")
 		}
-		return &http.Response{StatusCode: 200, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(`{"day":"2026-11-07"}`))}, nil
+		return &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(`{"day":"2026-11-07"}`))}, nil
 	})}
 	c := newClient(t, "https://example.test/prefix/", netdisco.WithTenant("tenant one"), netdisco.WithAPIKey("secret"), netdisco.WithHTTPClient(original))
 	got, err := c.Statistics(t.Context())
@@ -107,6 +108,7 @@ func TestClientResponseFailures(t *testing.T) {
 		{name: "size limit", body: `{"day":"long value"}`, status: 200, limit: 8, wantLarge: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			var calls atomic.Int32
 			body := &trackedBody{Reader: strings.NewReader(tc.body)}
 			hc := &http.Client{Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
@@ -168,7 +170,7 @@ func TestClientDoesNotFollowRedirect(t *testing.T) {
 	c := newClient(t, source.URL, netdisco.WithAPIKey("secret"))
 	_, err := c.Statistics(t.Context())
 	failure, ok := errors.AsType[*netdisco.HTTPError](err)
-	if !ok || failure.StatusCode != 302 || leaked.Load() {
+	if !ok || failure.StatusCode != http.StatusFound || leaked.Load() {
 		t.Fatalf("redirect followed: %v", err)
 	}
 }
@@ -204,7 +206,7 @@ func TestClientResponseLimitIncludesTrailingData(t *testing.T) {
 	const data = `{"day":"2026-11-07"}`
 	for _, suffix := range []string{"", " "} {
 		hc := &http.Client{Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
-			return &http.Response{StatusCode: 200, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(data + suffix))}, nil
+			return &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(data + suffix))}, nil
 		})}
 		c := newClient(t, "https://example.test", netdisco.WithHTTPClient(hc), netdisco.WithResponseLimit(int64(len(data))))
 		_, err := c.Statistics(t.Context())

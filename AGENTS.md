@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+Follow [the gatework Go engineering standard](https://github.com/gatework/go-standards/blob/v1.0.2/STANDARD.md) (go-standards/STANDARD.md). This repository keeps Go 1.27 as its minimum because its published `Reports.Run[T]` method requires generic methods; preserve that API. Run `make check` before committing.
+
 ## Project Structure & Module Organization
 
 This repository provides a Go 1.27+ client for Netdisco 2.117002 as one root `netdisco` package. Business APIs live in files such as `devices.go`, `ports.go`, `reports.go`, and `queue.go`; shared transport, authentication, and decoding live in `client.go`, `auth.go`, and `codec.go`. Root `*_test.go` files contain tests and examples. `testdata/upstream/` holds contract snapshots and provenance; `internal/integration/` contains Docker fixtures. Consult `docs/architecture.md` when changing module boundaries and `GLOSSARY.md` for domain terminology.

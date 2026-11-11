@@ -26,6 +26,7 @@ func TestCodecIntegerResponses(t *testing.T) {
 		{name: "quoted null", value: `"null"`, wantError: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { _, _ = fmt.Fprintf(w, `{"device_count":%s}`, tc.value) }))
 			defer server.Close()
 			c := newClient(t, server.URL)
@@ -53,6 +54,7 @@ func TestJSONFields(t *testing.T) {
 		{name: "array", input: `[]`, wantError: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			var fields netdisco.JSONFields
 			err := fields.UnmarshalJSON([]byte(tc.input))
 			if (err != nil) != tc.wantError {
@@ -76,6 +78,7 @@ func TestCodecRejectsMalformedNullableScalars(t *testing.T) {
 	for _, field := range []string{"is_pseudo", "slots", "since_first_seen"} {
 		for _, value := range []string{`null`, `"null"`} {
 			t.Run(field+"="+value, func(t *testing.T) {
+				t.Parallel()
 				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					_, _ = fmt.Fprintf(w, `[{"ip":"192.0.2.1",%q:%s}]`, field, value)
 				}))

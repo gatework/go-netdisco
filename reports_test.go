@@ -123,6 +123,7 @@ func TestReportsRunRejectsMalformedRefs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			rows, err := client.Reports.Run[json.RawMessage](t.Context(), tt.ref, nil)
 			if err == nil || rows != nil {
 				t.Fatalf("got rows=%#v, err=%v", rows, err)
@@ -145,6 +146,7 @@ func TestReportsRunFailureAndEmpty(t *testing.T) {
 		{"HTTP error", `{"error":"unavailable"}`, http.StatusServiceUnavailable, true},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			client := reportsTestClient(t, func(w http.ResponseWriter, req *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(tt.status)
@@ -251,7 +253,9 @@ func TestReportsListMalformedSwagger(t *testing.T) {
 	}
 }
 
+//nolint:tparallel // subtests share request accounting checked after the sequential loop
 func TestReportsNamedMethodsCoverPinnedAPI(t *testing.T) {
+	t.Parallel()
 	// Descriptions and route availability come from the independently captured
 	// 2.117002 Swagger fixture, rather than the implementation's route registry.
 	_, operations := pinnedReportOperations(t)
@@ -357,8 +361,6 @@ func TestReportsNamedMethodsCoverPinnedAPI(t *testing.T) {
 	}
 }
 
-func reportPtr[T any](value T) *T { return &value }
-
 func TestReportsQueryParameters(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -367,19 +369,19 @@ func TestReportsQueryParameters(t *testing.T) {
 		call func(*netdisco.Reports, context.Context) error
 	}{
 		{"port utilization", url.Values{"age_num": {"2"}, "age_unit": {"weeks"}}, func(r *netdisco.Reports, ctx context.Context) error {
-			return reportEmpty(r.PortUtilization(ctx, &netdisco.PortUtilizationOptions{AgeNum: reportPtr(2), AgeUnit: "weeks"}))
+			return reportEmpty(r.PortUtilization(ctx, &netdisco.PortUtilizationOptions{AgeNum: new(2), AgeUnit: "weeks"}))
 		}},
 		{"IP inventory", url.Values{"subnet": {"2001:db8::/64"}, "daterange": {"2026-01-01 to 2026-02-01"}, "age_invert": {"false"}, "never": {"false"}, "limit": {"32"}}, func(r *netdisco.Reports, ctx context.Context) error {
-			return reportEmpty(r.IPInventory(ctx, &netdisco.IPInventoryOptions{Subnet: "2001:db8::/64", DateRange: "2026-01-01 to 2026-02-01", AgeInvert: reportPtr(false), Never: reportPtr(false), Limit: reportPtr(32)}))
+			return reportEmpty(r.IPInventory(ctx, &netdisco.IPInventoryOptions{Subnet: "2001:db8::/64", DateRange: "2026-01-01 to 2026-02-01", AgeInvert: new(false), Never: new(false), Limit: new(32)}))
 		}},
 		{"subnets", url.Values{"subnet": {"10.0.0.0/8"}, "daterange": {"2026-01-01 to 2026-02-01"}, "age_invert": {"true"}}, func(r *netdisco.Reports, ctx context.Context) error {
-			return reportEmpty(r.SubnetUtilization(ctx, &netdisco.SubnetUtilizationOptions{Subnet: "10.0.0.0/8", DateRange: "2026-01-01 to 2026-02-01", AgeInvert: reportPtr(true)}))
+			return reportEmpty(r.SubnetUtilization(ctx, &netdisco.SubnetUtilizationOptions{Subnet: "10.0.0.0/8", DateRange: "2026-01-01 to 2026-02-01", AgeInvert: new(true)}))
 		}},
 		{"discovered nodes", url.Values{"remote_id": {"edge & core"}, "remote_type": {"AP:%", "IP Phone"}, "aps": {"false"}, "phones": {"true"}, "matchall": {"true"}}, func(r *netdisco.Reports, ctx context.Context) error {
-			return reportEmpty(r.DiscoveredNodes(ctx, &netdisco.DiscoveredNodesOptions{RemoteID: "edge & core", RemoteTypes: []string{"AP:%", "IP Phone"}, IncludeAPs: reportPtr(false), IncludePhones: reportPtr(true), MatchAll: reportPtr(true)}))
+			return reportEmpty(r.DiscoveredNodes(ctx, &netdisco.DiscoveredNodesOptions{RemoteID: "edge & core", RemoteTypes: []string{"AP:%", "IP Phone"}, IncludeAPs: new(false), IncludePhones: new(true), MatchAll: new(true)}))
 		}},
 		{"multiple nodes", url.Values{"vlan": {"42"}}, func(r *netdisco.Reports, ctx context.Context) error {
-			return reportEmpty(r.PortsWithMultipleNodes(ctx, reportPtr(42)))
+			return reportEmpty(r.PortsWithMultipleNodes(ctx, new(42)))
 		}},
 		{"SSID value", url.Values{"ssid": {"guest & lab?#東京"}}, func(r *netdisco.Reports, ctx context.Context) error {
 			return reportEmpty(r.SSIDPorts(ctx, "guest & lab?#東京"))
@@ -388,16 +390,16 @@ func TestReportsQueryParameters(t *testing.T) {
 			return reportEmpty(r.RecentlyAddedDevices(ctx, "2 weeks"))
 		}},
 		{"VLAN threshold zero", url.Values{"threshold": {"0"}}, func(r *netdisco.Reports, ctx context.Context) error {
-			return reportEmpty(r.PortsWithMostVLANs(ctx, reportPtr(0)))
+			return reportEmpty(r.PortsWithMostVLANs(ctx, new(0)))
 		}},
 		{"uplink VLAN grouping", url.Values{"chunk_size": {"7"}}, func(r *netdisco.Reports, ctx context.Context) error {
-			return reportEmpty(r.VLANsOnlyOnUplinks(ctx, reportPtr(7)))
+			return reportEmpty(r.VLANsOnlyOnUplinks(ctx, new(7)))
 		}},
 		{"unconfigured VLAN grouping", url.Values{"chunk_size": {"7"}}, func(r *netdisco.Reports, ctx context.Context) error {
-			return reportEmpty(r.VLANsNeverConfigured(ctx, reportPtr(7)))
+			return reportEmpty(r.VLANsNeverConfigured(ctx, new(7)))
 		}},
 		{"unused VLANs", url.Values{"chunk_size": {"7"}, "since": {"4 weeks"}}, func(r *netdisco.Reports, ctx context.Context) error {
-			return reportEmpty(r.UnusedVLANs(ctx, &netdisco.UnusedVLANsOptions{ChunkSize: reportPtr(7), Since: "4 weeks"}))
+			return reportEmpty(r.UnusedVLANs(ctx, &netdisco.UnusedVLANsOptions{ChunkSize: new(7), Since: "4 weeks"}))
 		}},
 	}
 	for _, tt := range tests {
@@ -425,22 +427,23 @@ func TestReportsRejectDangerousNumericOptions(t *testing.T) {
 		call func() error
 	}{
 		{"zero inventory limit", func() error {
-			_, err := client.Reports.IPInventory(t.Context(), &netdisco.IPInventoryOptions{Limit: reportPtr(0)})
+			_, err := client.Reports.IPInventory(t.Context(), &netdisco.IPInventoryOptions{Limit: new(0)})
 			return err
 		}},
 		{"negative inventory limit", func() error {
-			_, err := client.Reports.IPInventory(t.Context(), &netdisco.IPInventoryOptions{Limit: reportPtr(-1)})
+			_, err := client.Reports.IPInventory(t.Context(), &netdisco.IPInventoryOptions{Limit: new(-1)})
 			return err
 		}},
-		{"zero grouping", func() error { _, err := client.Reports.VLANsOnlyOnUplinks(t.Context(), reportPtr(0)); return err }},
-		{"negative grouping", func() error { _, err := client.Reports.VLANsNeverConfigured(t.Context(), reportPtr(-1)); return err }},
+		{"zero grouping", func() error { _, err := client.Reports.VLANsOnlyOnUplinks(t.Context(), new(0)); return err }},
+		{"negative grouping", func() error { _, err := client.Reports.VLANsNeverConfigured(t.Context(), new(-1)); return err }},
 		{"zero unused grouping", func() error {
-			_, err := client.Reports.UnusedVLANs(t.Context(), &netdisco.UnusedVLANsOptions{ChunkSize: reportPtr(0)})
+			_, err := client.Reports.UnusedVLANs(t.Context(), &netdisco.UnusedVLANsOptions{ChunkSize: new(0)})
 			return err
 		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if err := tt.call(); err == nil {
 				t.Fatal("invalid numeric option accepted")
 			}
@@ -475,6 +478,7 @@ func TestReportsDecodePinnedRuntimeRows(t *testing.T) {
 		_, _ = w.Write(data)
 	}, "")
 	t.Run("SSID detail replaces scalar port with relation", func(t *testing.T) {
+		t.Parallel()
 		rows, err := client.Reports.SSIDPorts(t.Context(), "fixture-wifi")
 		if err != nil {
 			t.Fatal(err)
@@ -488,6 +492,7 @@ func TestReportsDecodePinnedRuntimeRows(t *testing.T) {
 		}
 	})
 	t.Run("AP clients joined port object", func(t *testing.T) {
+		t.Parallel()
 		rows, err := client.Reports.APClients(t.Context())
 		if err != nil {
 			t.Fatal(err)
@@ -497,6 +502,7 @@ func TestReportsDecodePinnedRuntimeRows(t *testing.T) {
 		}
 	})
 	t.Run("radio power numeric string and SQL null", func(t *testing.T) {
+		t.Parallel()
 		rows, err := client.Reports.APRadioChannelPower(t.Context())
 		if err != nil {
 			t.Fatal(err)
@@ -506,6 +512,7 @@ func TestReportsDecodePinnedRuntimeRows(t *testing.T) {
 		}
 	})
 	t.Run("channel count", func(t *testing.T) {
+		t.Parallel()
 		rows, err := client.Reports.APChannelDistribution(t.Context())
 		if err != nil {
 			t.Fatal(err)

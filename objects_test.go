@@ -14,8 +14,6 @@ import (
 	netdisco "github.com/gatework/go-netdisco"
 )
 
-func objectPtr[T any](value T) *T { return &value }
-
 func TestPortEscapingSSIDCardinalityAndAbsentRelation(t *testing.T) {
 	t.Parallel()
 	const port = "Gi1/0/1 #% café"
@@ -41,7 +39,7 @@ func TestPortEscapingSSIDCardinalityAndAbsentRelation(t *testing.T) {
 	}
 	_, err = c.Ports.Power(t.Context(), "2001:db8::1", port)
 	var httpError *netdisco.HTTPError
-	if !errors.As(err, &httpError) || httpError.StatusCode != 404 {
+	if !errors.As(err, &httpError) || httpError.StatusCode != http.StatusNotFound {
 		t.Fatalf("missing single relation error = %v", err)
 	}
 }
@@ -59,7 +57,7 @@ func TestDeviceNodesIncludesNullableScalarsAndJSONB(t *testing.T) {
 	defer server.Close()
 	c := newClient(t, server.URL)
 	rows, err := c.Nodes.OnDevice(t.Context(), "192.0.2.1", netdisco.DeviceNodesOptions{
-		ActiveOnly: objectPtr(false), PortContext: objectPtr(true),
+		ActiveOnly: new(false), PortContext: new(true),
 		Include: []netdisco.NodeInclude{netdisco.NodeIncludeWireless, netdisco.NodeIncludeIPs, netdisco.NodeIncludeNetBIOS, netdisco.NodeIncludeManufacturer},
 	})
 	if err != nil || len(rows) != 1 {
@@ -88,7 +86,7 @@ func TestNeighborMapPreservesOpenGraphAndMixedScalars(t *testing.T) {
 	}))
 	defer server.Close()
 	c := newClient(t, server.URL)
-	got, err := c.Devices.Neighbors(t.Context(), "192.0.2.1", netdisco.NeighborOptions{Scope: netdisco.NeighborCloud, VLAN: objectPtr(100)})
+	got, err := c.Devices.Neighbors(t.Context(), "192.0.2.1", netdisco.NeighborOptions{Scope: netdisco.NeighborCloud, VLAN: new(100)})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,7 +137,7 @@ func TestDeviceImportsAndJobDeletionRequests(t *testing.T) {
 	if err := c.Devices.ImportNodes(t.Context(), "192.0.2.1", []netdisco.NodeImport{{Port: "Gi1/0/1", VLAN: 0, MAC: "02:00:00:00:00:01"}}); err != nil {
 		t.Fatal(err)
 	}
-	if err := c.Devices.ImportARPs(t.Context(), "192.0.2.1", []netdisco.ARPImport{{MAC: "02:00:00:00:00:01", IP: "2001:db8::1", DNS: objectPtr("")}}); err != nil {
+	if err := c.Devices.ImportARPs(t.Context(), "192.0.2.1", []netdisco.ARPImport{{MAC: "02:00:00:00:00:01", IP: "2001:db8::1", DNS: new("")}}); err != nil {
 		t.Fatal(err)
 	}
 	count, err := c.Devices.DeleteJobs(t.Context(), "192.0.2.1", netdisco.DeviceJobsFilter{Port: "Gi1/0/1", Action: "macsuck", Status: "queued", Username: "u+a", UserIP: "2001:db8::1", Backend: "backend one"})
@@ -152,6 +150,7 @@ func TestDeviceImportsAndJobDeletionRequests(t *testing.T) {
 	}
 }
 
+//nolint:tparallel // subtests share request accounting checked after the sequential loop
 func TestDeviceJobDeletionRejectsFiltersIgnoredByPerl(t *testing.T) {
 	t.Parallel()
 	var requests atomic.Int32

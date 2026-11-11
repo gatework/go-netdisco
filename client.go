@@ -208,11 +208,12 @@ func WithResponseLimit(bytes int64) Option {
 func (c *Client) CloseIdleConnections() { c.httpClient.CloseIdleConnections() }
 
 func apiPath(parts ...string) string {
-	path := "/api/v1"
+	var path strings.Builder
+	path.WriteString("/api/v1")
 	for _, part := range parts {
-		path += "/" + escapeSegment(part)
+		path.WriteString("/" + escapeSegment(part))
 	}
-	return path
+	return path.String()
 }
 
 func escapeSegment(part string) string {

@@ -1,0 +1,7 @@
+# The library remains one public package; integration helpers are separate.
+declared: [., ./internal/integration/...]
+rules:
+  - name: library does not depend on integration fixtures
+    packages: [.]
+    deny: [./internal/...]
+    transitive: true

@@ -12,6 +12,7 @@ import (
 // NodeInclude selects a relation embedded in each node list result.
 type NodeInclude string
 
+// Relations the server can include in each node row.
 const (
 	NodeIncludeWireless     NodeInclude = "wireless"
 	NodeIncludeIPs          NodeInclude = "ips"

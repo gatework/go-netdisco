@@ -12,54 +12,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  check:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v7.0.0
         with:
           go-version: '1.27.x'
+          check-latest: true
           cache: false
-      - run: go test -race -shuffle=on ./...
-      - run: go vet ./...
-      - run: go mod tidy && git diff --exit-code -- go.mod go.sum
-
-  lint:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-go@v7.0.0
-        with:
-          go-version: '1.27.x'
-          cache: false
-      - uses: golangci/golangci-lint-action@v9.3.0
-        with:
-          version: v2.15.0
-
-  vulnerabilities:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-go@v7.0.0
-        with:
-          go-version: '1.27.x'
-          cache: false
-      - run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+      - run: make check
+      - run: make workflows
 
   integration:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v7.0.0
         with:
           go-version: '1.27.x'
+          check-latest: true
           cache: false
-      - run: ./script/integration -v
+      - run: make integration

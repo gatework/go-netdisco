@@ -7,7 +7,7 @@ The [v0.1.0 release](https://github.com/gatework/go-netdisco/releases/tag/v0.1.0
 ## Usage
 
 ```sh
-go get github.com/gatework/go-netdisco@v0.1.0
+go get github.com/gatework/go-netdisco@v0.1.1
 ```
 
 ```go
@@ -114,10 +114,8 @@ Queue deletion also clears skiplist entries. **Only Device, Action and Backend n
 ## Verification
 
 ```sh
-go test -race -shuffle=on ./...
-go vet ./...
-go run golang.org/x/vuln/cmd/govulncheck@latest ./...
-./script/integration -v
+make check
+make integration
 ```
 
 The integration script starts digest-pinned Netdisco 2.117002 and PostgreSQL, deploys real schemas, seeds synthetic data, runs the public client interface and tears down its containers and volumes. It binds only to localhost and starts no collection scheduler. Docker Compose is required. See [verification and scope](docs/upstream-contract.md), [architecture](docs/architecture.md), and [domain glossary](GLOSSARY.md).

@@ -21,7 +21,7 @@ func TestAuthFailedLoginCanRecover(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/login" {
 			if logins.Add(1) == 1 {
-				w.WriteHeader(401)
+				w.WriteHeader(http.StatusUnauthorized)
 				_, _ = fmt.Fprint(w, `{"error":"authentication failed"}`)
 				return
 			}
@@ -64,7 +64,7 @@ func TestAuthRefreshRebuildsBodyAndPreservesBasicAuth(t *testing.T) {
 			}
 			bodies <- string(data)
 			if submits.Add(1) == 1 {
-				w.WriteHeader(401)
+				w.WriteHeader(http.StatusUnauthorized)
 				_, _ = fmt.Fprint(w, `{"error":"expired"}`)
 				return
 			}
@@ -77,7 +77,7 @@ func TestAuthRefreshRebuildsBodyAndPreservesBasicAuth(t *testing.T) {
 			_, _ = fmt.Fprint(w, `{"success":1}`)
 		default:
 			t.Errorf("unexpected path %q", r.URL.Path)
-			w.WriteHeader(404)
+			w.WriteHeader(http.StatusNotFound)
 		}
 	}))
 	defer server.Close()
@@ -112,7 +112,7 @@ func TestAuthConcurrentRefresh(t *testing.T) {
 			case <-r.Context().Done():
 				return
 			}
-			w.WriteHeader(401)
+			w.WriteHeader(http.StatusUnauthorized)
 			_, _ = fmt.Fprint(w, `{"error":"expired"}`)
 			return
 		}
@@ -181,14 +181,14 @@ func TestAuthRefreshIsBounded(t *testing.T) {
 			return
 		}
 		reads.Add(1)
-		w.WriteHeader(401)
+		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = fmt.Fprint(w, `{"error":"denied"}`)
 	}))
 	defer server.Close()
 	c := newClient(t, server.URL, netdisco.WithCredentials("user", "password"))
 	_, err := c.Statistics(t.Context())
 	failure, ok := errors.AsType[*netdisco.HTTPError](err)
-	if !ok || failure.StatusCode != 401 {
+	if !ok || failure.StatusCode != http.StatusUnauthorized {
 		t.Fatalf("error = %v", err)
 	}
 	if logins.Load() != 2 || reads.Load() != 2 {
@@ -207,6 +207,7 @@ func TestAuthStaticTokenAndMissingKey(t *testing.T) {
 		{name: "empty login token", body: `{}`, status: 200, opts: []netdisco.Option{netdisco.WithCredentials("user", "password")}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			var calls atomic.Int32
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				calls.Add(1)
@@ -229,6 +230,7 @@ func TestTenantSessionBootstrap(t *testing.T) {
 	t.Parallel()
 	for _, bootstrapStatus := range []int{200, 404, 401, 500} {
 		t.Run(fmt.Sprint(bootstrapStatus), func(t *testing.T) {
+			t.Parallel()
 			var tenantCalls, bootstrapCalls atomic.Int32
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.Header.Get("Authorization") != "Bearer static-key" {
@@ -252,14 +254,14 @@ func TestTenantSessionBootstrap(t *testing.T) {
 						t.Errorf("tenant operation changed: %s %s", r.Method, data)
 					}
 					if cookie, err := r.Cookie("session"); err != nil || cookie.Value != "ready" {
-						w.WriteHeader(401)
+						w.WriteHeader(http.StatusUnauthorized)
 						_, _ = fmt.Fprint(w, `{"error":"session required"}`)
 						return
 					}
 					_, _ = fmt.Fprint(w, `{"success":true}`)
 				default:
 					t.Errorf("operation escaped selected tenant: %s %s", r.Method, r.URL.Path)
-					w.WriteHeader(500)
+					w.WriteHeader(http.StatusInternalServerError)
 				}
 			}))
 			defer server.Close()

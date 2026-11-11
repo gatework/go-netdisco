@@ -23,6 +23,7 @@ type PageOptions struct {
 // included for explicit projections because upstream needs it to collapse rows.
 type DeviceField string
 
+// Selectable columns accepted by device search.
 const (
 	DeviceFieldAll          DeviceField = "all"
 	DeviceFieldIP           DeviceField = "ip"
@@ -347,6 +348,7 @@ type NodeSearchOptions struct {
 // NodeSearchKind distinguishes the upstream search response variants.
 type NodeSearchKind string
 
+// Upstream node search response variants.
 const (
 	NodeSearchEmpty     NodeSearchKind = "empty"
 	NodeSearchByMAC     NodeSearchKind = "mac"

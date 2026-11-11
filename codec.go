@@ -14,6 +14,7 @@ import (
 // may encode JSONB directly or as a JSON string. Nil preserves absent/null.
 type JSONFields map[string]json.RawMessage
 
+// UnmarshalJSON preserves nullable raw values and decodes string-encoded objects.
 func (f *JSONFields) UnmarshalJSON(data []byte) error {
 	data = bytes.TrimSpace(data)
 	if bytes.Equal(data, []byte("null")) {

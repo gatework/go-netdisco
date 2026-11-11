@@ -7,8 +7,8 @@ binary archives to rebuild or upload.
 1. Inspect all worktrees and the remote branch, tags and releases. Preserve
    unrelated edits and choose an unused semantic version. Update `CHANGELOG.md`
    and the README installation version.
-2. Commit the intended files and push the release commit to `main` without
-   rewriting history. Wait for every CI job to succeed for that exact commit,
+2. Commit the intended files on a branch, open a pull request, and merge only after
+   its checks succeed. Wait for every CI job to succeed for that exact commit,
    including race tests on Linux/macOS, vet, lint, vulnerability checks and the
    pinned Netdisco/PostgreSQL integration.
 3. Create an annotated `vMAJOR.MINOR.PATCH` tag at the validated commit and push

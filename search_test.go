@@ -32,7 +32,7 @@ func TestDeviceSearchProjectionRepeatedFiltersAndNullableData(t *testing.T) {
 	defer server.Close()
 	c := newClient(t, server.URL)
 	rows, err := c.Devices.Search(t.Context(), netdisco.DeviceSearchOptions{
-		Q: "core & edge", Models: []string{"Model A", "Model&B"}, Vendors: []string{"first", "second"}, MatchAll: objectPtr(false),
+		Q: "core & edge", Models: []string{"Model A", "Model&B"}, Vendors: []string{"first", "second"}, MatchAll: new(false),
 		Fields: []netdisco.DeviceField{netdisco.DeviceFieldName, netdisco.DeviceFieldAuthTag}, Page: &netdisco.PageOptions{Limit: 2},
 	})
 	if err != nil || len(rows) != 1 {
@@ -47,6 +47,7 @@ func TestDeviceSearchProjectionRepeatedFiltersAndNullableData(t *testing.T) {
 	}
 }
 
+//nolint:tparallel // subtests share request accounting checked after the sequential loop
 func TestDeviceSearchRejectsInvalidProjectionAndPageBeforeIO(t *testing.T) {
 	t.Parallel()
 	var calls atomic.Int32
@@ -107,6 +108,7 @@ func TestDevicesAllLazyPagingAndEarlyStop(t *testing.T) {
 	t.Parallel()
 	for _, mode := range []string{"all", "break", "cancel"} {
 		t.Run(mode, func(t *testing.T) {
+			t.Parallel()
 			var calls atomic.Int32
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				calls.Add(1)
@@ -212,6 +214,7 @@ func TestNodeSearchTypedVariants(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Query().Get("q") != "host & alias" || r.URL.Query().Get("deviceports") != "false" || r.URL.Query().Get("port_context") != "true" || r.URL.Query().Get("daterange") != "2026-11-01 to 2026-11-07" {
 					t.Errorf("query = %v", r.URL.Query())
@@ -220,7 +223,7 @@ func TestNodeSearchTypedVariants(t *testing.T) {
 			}))
 			defer server.Close()
 			c := newClient(t, server.URL)
-			got, err := c.Nodes.Search(t.Context(), netdisco.NodeSearchOptions{Q: "host & alias", DevicePorts: objectPtr(false), PortContext: objectPtr(true), DateRange: "2026-11-01 to 2026-11-07"})
+			got, err := c.Nodes.Search(t.Context(), netdisco.NodeSearchOptions{Q: "host & alias", DevicePorts: new(false), PortContext: new(true), DateRange: "2026-11-01 to 2026-11-07"})
 			if err != nil || got.Kind != tc.kind {
 				t.Fatalf("search = %+v, %v", got, err)
 			}

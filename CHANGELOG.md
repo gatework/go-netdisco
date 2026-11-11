@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.1] - 2026-11-11
+
+- Adopt go-standards v1.0.2 through a shared lint configuration, explicit import boundaries and `make check`.
+- Keep the Go 1.27 generic report method API and the independent Netdisco/PostgreSQL integration covering all 79 default operations.
+
+
 ## [0.1.0] - 2026-11-07
 
 First versioned release of `github.com/gatework/go-netdisco`, targeting
@@ -45,3 +51,5 @@ worker and synthetic data without collector workers or real devices. See
 [local verification](docs/verification.md).
 
 [0.1.0]: https://github.com/gatework/go-netdisco/releases/tag/v0.1.0
+
+[0.1.1]: https://github.com/gatework/go-netdisco/releases/tag/v0.1.1

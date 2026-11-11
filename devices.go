@@ -63,6 +63,7 @@ func (s *Devices) PowerModules(ctx context.Context, ip string) ([]DevicePowerMod
 // NeighborScope selects the server's topology traversal.
 type NeighborScope string
 
+// Neighbor traversal modes accepted by the pinned server.
 const (
 	NeighborDepth NeighborScope = "depth"
 	NeighborCloud NeighborScope = "cloud"

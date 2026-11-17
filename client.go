@@ -424,3 +424,11 @@ func setInt(v url.Values, key string, value *int) {
 		v.Set(key, strconv.Itoa(*value))
 	}
 }
+
+func cloneQuery(values url.Values) url.Values {
+	out := make(url.Values, len(values))
+	for key, items := range values {
+		out[key] = append([]string(nil), items...)
+	}
+	return out
+}

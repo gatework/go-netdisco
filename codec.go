@@ -114,3 +114,18 @@ func decodeInteger[T ~int | ~int64](data []byte, out *T) error {
 }
 
 func decodeJSON(data []byte, out any) error { return jsonv2.Unmarshal(data, out, wireOptions) }
+
+// deletionResult distinguishes a confirmed zero count from a missing acknowledgment.
+type deletionResult struct {
+	Deleted *int64 `json:"deleted"`
+}
+
+func (r deletionResult) count(err error) (int64, error) {
+	if err != nil {
+		return 0, err
+	}
+	if r.Deleted == nil {
+		return 0, errors.New("netdisco: deletion response contains no deleted count")
+	}
+	return *r.Deleted, nil
+}

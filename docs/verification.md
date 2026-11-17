@@ -30,3 +30,7 @@ workers were used. This record captures local checks before publication. Current
 publication evidence is recorded in [GitHub Actions](https://github.com/gatework/go-netdisco/actions)
 and [Releases](https://github.com/gatework/go-netdisco/releases). No deployment
 or real-device acceptance is implied by these checks.
+
+## Node decoding measurement
+
+`go test -run '^$' -bench BenchmarkNodeSearchDecode -benchmem -count=10 -benchtime=100ms` measures the public `encoding/json` compatibility path with 100 and 10,000 address matches. On Go 1.27.4 / darwin arm64 / Apple M5, a top-level token-stream decoder candidate reduced B/op by 8.5% and 7.9%, but increased time by 14.3% and 18.1% (benchstat, n=10). That candidate was rejected; the existing decoder remains. These synthetic results do not establish production HTTP throughput or peak-memory improvements. The benchmark remains for future comparisons.

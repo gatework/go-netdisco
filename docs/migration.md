@@ -61,3 +61,7 @@ Timestamp strings are not automatically parsed into `time.Time`. Netdisco's SQL 
 Use `HTTPError.StatusCode` for 401/403/404 distinctions. Empty collections do not necessarily mean the parent exists; several upstream relation queries return an empty list for a missing parent. Missing singular objects generally return 404.
 
 `Auth.Logout` is session termination, while `Users.RevokeToken` is administrative revocation. Do not infer remote revocation from logout's 200 response. Queue/import acceptance, queue inspection and completed device processing are distinct stages. See [upstream contracts](upstream-contract.md) for the exact baseline's limitations.
+
+## Reliability updates
+
+Public call signatures are unchanged. Queue and device job deletion now require a non-null `deleted` count; malformed acknowledgments return an error and are never retried. `Devices.All` captures filters when created, while network access and errors remain lazy. Concurrent credential callers share an exchange with its own timeout; canceling one caller does not cancel other waiters. When all callers leave, the exchange is canceled before another may start.

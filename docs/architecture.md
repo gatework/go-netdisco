@@ -16,7 +16,7 @@ The `http.RoundTripper` seam is real: the production HTTP adapter, contract-test
 
 The named reports share one private route registry. `Reports.Run[T]` is the extension seam for installation-defined columns and parameters; `Reports.List` reads actual Swagger discovery. Separate models retain real row shapes, rather than forcing every report into a Device or `map[string]any`.
 
-`Devices.All` provides leverage over page handling without introducing a universal pagination interface. Other searches, reports and queue listings have different contracts. The iterator is synchronous and lazy; it creates no goroutines, buffers or hidden prefetch lifecycle.
+`Devices.All` provides leverage over page handling without introducing a universal pagination interface. Other searches, reports and queue listings have different contracts. The iterator owns a query snapshot captured at creation. Each traversal has independent pagination state. The iterator is synchronous and lazy; it creates no goroutines, buffers or hidden prefetch lifecycle.
 
 ## Data fidelity
 
@@ -29,3 +29,5 @@ Node search's object/array variants form a tagged union. Topology's mixed scalar
 Public methods are the test surface. HTTP contracts prove cancellation, deadline and error causes, body recreation, token refresh concurrency, path/query encoding, sparse rows and response variants. An independently captured Swagger snapshot defines the operation inventory. Real integration calls must reach every default operation through the public interface; seed data and pinned runtime fixtures supply relational shape evidence.
 
 This provides depth through the behavior hidden behind the interface, not additional abstraction layers. There is one production HTTP adapter, standard Go data structures and no external runtime dependency.
+
+Shared credential exchanges retain caller metadata but use an independent bounded context. Each caller owns its wait; the last departing waiter cancels the exchange. An abandoned exchange finishes before a new one starts, and cannot publish a token. Token generation checks prevent stale exchanges from replacing newer authentication state.

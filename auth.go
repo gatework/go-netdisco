@@ -27,6 +27,9 @@ type Token struct {
 
 type loginFlight struct {
 	done       chan struct{}
+	cancel     context.CancelFunc
+	waiters    int
+	abandoned  bool
 	token      Token
 	generation uint64
 	err        error
@@ -55,27 +58,55 @@ func (c *Client) login(ctx context.Context, observed uint64, force bool) (Token,
 	if c.username == "" {
 		return Token{}, 0, errors.New("netdisco: login requires credentials")
 	}
-	if err := ctx.Err(); err != nil {
-		return Token{}, 0, fmt.Errorf("netdisco: login canceled: %w", err)
-	}
-	c.authMu.Lock()
-	if c.token.APIKey != "" && (!force || c.generation != observed) {
-		token, generation := c.token, c.generation
-		c.authMu.Unlock()
-		return token, generation, nil
-	}
-	if flight := c.loginFlight; flight != nil {
+	for {
+		if err := ctx.Err(); err != nil {
+			return Token{}, 0, fmt.Errorf("netdisco: login canceled: %w", err)
+		}
+		c.authMu.Lock()
+		if c.token.APIKey != "" && (!force || c.generation != observed) {
+			token, generation := c.token, c.generation
+			c.authMu.Unlock()
+			return token, generation, nil
+		}
+		flight := c.loginFlight
+		if flight != nil && flight.abandoned {
+			c.authMu.Unlock()
+			select {
+			case <-ctx.Done():
+				return Token{}, 0, fmt.Errorf("netdisco: wait for login: %w", ctx.Err())
+			case <-flight.done:
+				continue
+			}
+		}
+		if flight == nil {
+			shared, cancel := context.WithTimeout(context.WithoutCancel(ctx), c.timeout)
+			flight = &loginFlight{done: make(chan struct{}), cancel: cancel}
+			c.loginFlight = flight
+			go c.exchangeLogin(shared, flight, c.generation)
+		}
+		flight.waiters++
 		c.authMu.Unlock()
 		select {
 		case <-ctx.Done():
-			return Token{}, 0, fmt.Errorf("netdisco: wait for login: %w", ctx.Err())
 		case <-flight.done:
-			return flight.token, flight.generation, flight.err
 		}
+		c.authMu.Lock()
+		flight.waiters--
+		if flight.waiters == 0 && c.loginFlight == flight {
+			flight.abandoned = true
+			flight.cancel()
+		}
+		c.authMu.Unlock()
+		if err := ctx.Err(); err != nil {
+			return Token{}, 0, fmt.Errorf("netdisco: wait for login: %w", err)
+		}
+		return flight.token, flight.generation, flight.err
 	}
-	flight := &loginFlight{done: make(chan struct{})}
-	c.loginFlight = flight
-	c.authMu.Unlock()
+}
+
+// One exchange is owned by its live waiters, rather than the first caller.
+func (c *Client) exchangeLogin(ctx context.Context, flight *loginFlight, generation uint64) {
+	defer flight.cancel()
 	body, err := encodeBody(c.loginOptions)
 	var token Token
 	if err == nil {
@@ -85,7 +116,7 @@ func (c *Client) login(ctx context.Context, observed uint64, force bool) (Token,
 		err = errors.New("netdisco: login response contains no api key")
 	}
 	c.authMu.Lock()
-	if err == nil {
+	if err == nil && !flight.abandoned && c.generation == generation {
 		c.token = token
 		c.generation++
 	}
@@ -93,7 +124,6 @@ func (c *Client) login(ctx context.Context, observed uint64, force bool) (Token,
 	c.loginFlight = nil
 	close(flight.done)
 	c.authMu.Unlock()
-	return token, flight.generation, err
 }
 
 // Logout calls the cookie-backed endpoint and clears the local token. On

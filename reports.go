@@ -37,10 +37,7 @@ func (r *Reports) Run[T any](ctx context.Context, ref ReportRef, params url.Valu
 	if err := validateReportRef(ref); err != nil {
 		return nil, err
 	}
-	query := make(url.Values, len(params))
-	for key, values := range params {
-		query[key] = append([]string(nil), values...)
-	}
+	query := cloneQuery(params)
 	rows, err := get[[]T](ctx, r.client, apiPath("report", ref.Category, ref.Tag), query)
 	if err != nil {
 		return nil, err

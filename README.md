@@ -7,7 +7,7 @@ The [v0.1.0 release](https://github.com/gatework/go-netdisco/releases/tag/v0.1.0
 ## Usage
 
 ```sh
-go get github.com/gatework/go-netdisco@v0.1.1
+go get github.com/gatework/go-netdisco@v0.1.2
 ```
 
 ```go

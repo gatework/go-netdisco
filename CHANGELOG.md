@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.2] - 2026-11-16
+
+- Reject missing or null deletion counts rather than reporting an unconfirmed zero.
+- Isolate shared credential exchanges from individual caller cancellation.
+- Snapshot lazy device queries and separate device and node search responsibilities.
+
 ## [0.1.1] - 2026-11-11
 
 - Adopt go-standards v1.0.2 through a shared lint configuration, explicit import boundaries and `make check`.

@@ -124,10 +124,8 @@ func (s *Devices) DeleteJobs(ctx context.Context, ip string, opts DeviceJobsFilt
 	if err != nil {
 		return 0, err
 	}
-	result, err := send[struct {
-		Deleted int64 `json:"deleted"`
-	}](ctx, s.client, http.MethodDelete, apiPath("object", "device", ip, "jobs"), query, nil)
-	return result.Deleted, err
+	result, err := send[deletionResult](ctx, s.client, http.MethodDelete, apiPath("object", "device", ip, "jobs"), query, nil)
+	return result.count(err)
 }
 
 // NodeImport is one forwarding-table entry. VLAN is always sent explicitly;

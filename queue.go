@@ -155,10 +155,8 @@ func (q *Queue) Delete(ctx context.Context, filter JobFilter) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	result, err := send[struct {
-		Deleted int64 `json:"deleted"`
-	}](
+	result, err := send[deletionResult](
 		ctx, q.client, http.MethodDelete, apiPath("queue", "jobs"), values, nil,
 	)
-	return result.Deleted, err
+	return result.count(err)
 }
